@@ -17,7 +17,7 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
   // Identificador del dispositivo que queremos mostrar
-  var deviceIdToDisplay = 'eui-2cf7f1c054600550';
+  var deviceIdToDisplay = 'identificador-del-dispositivo-a-mostrar';
 
   // Inicializar el mapa
   var map = L.map('map').setView([0, 0], 2);
@@ -30,7 +30,7 @@
   // Función para obtener los datos de TTN
   function getTTNData() {
     $.ajax({
-      url: 'https://eu.thethings.network/api/v3/as/applications/tarjetas-gps/packages/storage/uplink_message?limit=100',
+      url: 'https://eu.thethings.network/api/v3/as/applications/eui-2cf7f1c054600550/packages/storage/uplink_message?limit=100',
       type: 'GET',
       headers: {
         'Authorization': 'NNSXS.OAKR4CXXRBWGM5PAKJVH6QGFA3SERZ2YMHZ3EHI.K2H53QK5IHGOW7JN4RJNXTPAORQAQHB4XXPXQ52TOVWJ3ZGRL5IA' // Reemplaza 'tu-access-key' con tu clave de acceso a TTN
@@ -72,4 +72,3 @@
 
 </body>
 </html>
-
