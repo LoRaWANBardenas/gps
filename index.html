@@ -1,21 +1,35 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-      var appId = 'tarjetas-gps'; // Reemplaza 'tu-app-id' con el AppID de tu aplicación en TTN
-      var accessKey = 'NNSXS.3OVS4CD3IZGCWFDZCAN2P3GZZ5DUVO5SRTCC3PA.S6NSLRHI3YWUVP2IVA4FZKHXR5VNWLPWP7IFQSSDGLF7STVXHHIA'; // Reemplaza 'tu-access-key' con el Access Key de tu aplicación en TTN
-  
-      $.ajax({
-        url: 'https://eu.thethings.network/api/v3/as/applications/' + appId + '/packages/storage/uplink_message?limit=100', // Cambia 'eu' por la región correspondiente a tu aplicación
-        type: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + accessKey
-        },
-        success: function(response) {
-          console.log(response); // Aquí puedes ver la respuesta de la API en la consola del navegador
-        }
-      });
-    });
-  </script>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa con Leaflet</title>
+  <!-- Incluir la hoja de estilos de Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  
+  <!-- Estilos personalizados -->
+  <style>
+    #map { height: 400px; }
+  </style>
+</head>
+<body>
+
+<!-- Div para el mapa -->
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  // Inicializar el mapa
+  var map = L.map('map').setView([51.505, -0.09], 13);
+
+  // Añadir capa de mapa base de OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Añadir marcador en una ubicación específica
+  var marker = L.marker([51.5, -0.09]).addTo(map);
+  marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+</script>
+
+</body>
+</html>
