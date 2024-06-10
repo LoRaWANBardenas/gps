@@ -1,0 +1,21 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+      var appId = 'tarjetas-gps'; // Reemplaza 'tu-app-id' con el AppID de tu aplicación en TTN
+      var accessKey = 'NNSXS.3OVS4CD3IZGCWFDZCAN2P3GZZ5DUVO5SRTCC3PA.S6NSLRHI3YWUVP2IVA4FZKHXR5VNWLPWP7IFQSSDGLF7STVXHHIA'; // Reemplaza 'tu-access-key' con el Access Key de tu aplicación en TTN
+  
+      $.ajax({
+        url: 'https://eu.thethings.network/api/v3/as/applications/' + appId + '/packages/storage/uplink_message?limit=100', // Cambia 'eu' por la región correspondiente a tu aplicación
+        type: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + accessKey
+        },
+        success: function(response) {
+          console.log(response); // Aquí puedes ver la respuesta de la API en la consola del navegador
+        }
+      });
+    });
+  </script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  
