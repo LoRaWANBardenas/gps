@@ -1,0 +1,77 @@
+name: Update GPS Data
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Esto ejecuta el flujo de trabajo cada 5 minutos
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+
+    - name: Install dependencies
+      run: |
+        pip install requests paho-mqtt
+
+    - name: Fetch GPS Data and Update
+      env:
+        TTN_API_KEY: ${{ secrets.TTN_API_KEY }}
+      run: |
+        import json
+        import requests
+        import paho.mqtt.client as mqtt
+
+        broker = "eu1.cloud.thethings.network"
+        port = 1883
+        topic = "v3/+/devices/eui-2cf7f1c053400274/up"
+        client_id = "tarjetas-gps"
+        api_key = "${{ env.TTN_API_KEY }}"
+
+        lat, lon = None, None
+
+        def on_connect(client, userdata, flags, rc):
+            print("Connected with result code " + str(rc))
+            client.subscribe(topic)
+
+        def on_message(client, userdata, msg):
+            global lat, lon
+            payload = json.loads(msg.payload.decode())
+            decoded_payload = payload["uplink_message"]["decoded_payload"]
+            lat = decoded_payload["latitude"]
+            lon = decoded_payload["longitude"]
+            client.disconnect()
+
+        client = mqtt.Client(client_id)
+        client.username_pw_set(username="tarjetas-gps", password=api_key)
+        client.on_connect = on_connect
+        client.on_message = on_message
+
+        client.connect(broker, port, 60)
+        client.loop_start()
+        while lat is None or lon is None:
+            pass
+
+        data = {
+            "latitude": lat,
+            "longitude": lon
+        }
+
+        with open('data.json', 'w') as f:
+            json.dump(data, f)
+
+    - name: Commit and push data
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add data.json
+        git commit -m 'Update GPS data'
+        git push
