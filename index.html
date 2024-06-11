@@ -1,74 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GPS Tracker</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    #map { height: 500px; }
-  </style>
+    <title>GPS Data</title>
+    <meta charset="UTF-8">
 </head>
 <body>
+    <h1>GPS Data</h1>
+    <p id="latitude">Latitude: loading...</p>
+    <p id="longitude">Longitude: loading...</p>
 
-<div id="map"></div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  // Identificador del dispositivo que queremos mostrar
-  var deviceIdToDisplay = 'identificador-del-dispositivo-a-mostrar';
-
-  // Inicializar el mapa
-  var map = L.map('map').setView([0, 0], 2);
-
-  // Añadir capa de mapa base de OpenStreetMap
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map);
-
-  // Función para obtener los datos de TTN
-  function getTTNData() {
-    $.ajax({
-      url: 'https://eu1.cloud.thethings.network/api/v3/as/applications/eui-2cf7f1c054600550/packages/storage/uplink_message?limit=100',
-      type: 'GET',
-      headers: {
-        'Authorization': 'NNSXS.OAKR4CXXRBWGM5PAKJVH6QGFA3SERZ2YMHZ3EHI.K2H53QK5IHGOW7JN4RJNXTPAORQAQHB4XXPXQ52TOVWJ3ZGRL5IA' // Reemplaza 'tu-access-key' con tu clave de acceso a TTN
-      },
-      success: function(response) {
-        // Procesar los datos y agregar marcadores al mapa
-        processData(response);
-      },
-      error: function(xhr, status, error) {
-        console.error('Error al obtener datos de TTN:', error);
-      }
-    });
-  }
-
-  // Función para procesar los datos y agregar marcadores al mapa
-  function processData(data) {
-    // Iterar sobre los datos y agregar marcadores al mapa solo si coinciden con el dispositivo a mostrar
-    data.forEach(function(message) {
-      // Verificar si el mensaje corresponde al dispositivo que queremos mostrar
-      if (message.end_device_ids.device_id === deviceIdToDisplay) {
-        // Extraer la latitud y longitud del mensaje
-        var lat = message.uplink_message.decoded_payload.latitude;
-        var lon = message.uplink_message.decoded_payload.longitude;
-
-        // Verificar si la latitud y longitud son válidas
-        if (lat && lon) {
-          // Añadir marcador al mapa
-          L.marker([lat, lon]).addTo(map);
+    <script>
+        async function fetchData() {
+            const response = await fetch('data.json');
+            const data = await response.json();
+            const { latitude, longitude } = data;
+            document.getElementById('latitude').innerText = 'Latitude: ' + latitude;
+            document.getElementById('longitude').innerText = 'Longitude: ' + longitude;
         }
-      }
-    });
-  }
 
-  // Llamar a la función para obtener los datos de TTN cuando la página esté cargada
-  $(document).ready(function() {
-    getTTNData();
-  });
-</script>
-
+        fetchData();
+        setInterval(fetchData, 300000); // Fetch data every 5 minutes
+    </script>
 </body>
 </html>
