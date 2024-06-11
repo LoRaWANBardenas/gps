@@ -11,12 +11,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.x
+        python-version: '3.x'
 
     - name: Install dependencies
       run: |
@@ -27,14 +27,14 @@ jobs:
         TTN_API_KEY: ${{ secrets.TTN_API_KEY }}
       run: |
         import json
-        import requests
+        import time
         import paho.mqtt.client as mqtt
 
         broker = "eu1.cloud.thethings.network"
         port = 1883
         topic = "v3/+/devices/eui-2cf7f1c053400274/up"
         client_id = "tarjetas-gps"
-        api_key = "${{ env.TTN_API_KEY }}"
+        api_key = "${{ secrets.TTN_API_KEY }}"
 
         lat, lon = None, None
 
@@ -57,8 +57,11 @@ jobs:
 
         client.connect(broker, port, 60)
         client.loop_start()
+        timeout = time.time() + 60*1  # 1 minute from now
         while lat is None or lon is None:
-            pass
+            if time.time() > timeout:
+                raise Exception("Timeout waiting for MQTT message")
+            time.sleep(1)
 
         data = {
             "latitude": lat,
